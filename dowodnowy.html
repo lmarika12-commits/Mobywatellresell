@@ -581,117 +581,61 @@
                 </div>
 
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // helper: bezpieczny getter
-  function getLS(key) {
-    try {
-      return localStorage.getItem(key) || '';
-    } catch (e) {
-      console.error('localStorage error', e);
-      return '';
+  <script>
+    // Funkcja pomocnicza do ustawiania tekstu
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
     }
-  }
 
-  // helper: format DD.MM.YYYY
-  function formatDatePolish(dateStr) {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr || '—';
-    const dd = String(d.getDate()).padStart(2,'0');
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    const yyyy = d.getFullYear();
-    return `${dd}.${mm}.${yyyy}`;
-  }
-
-  // Jeżeli nie ma podstawowych danych -> wróć
-  if (!getLS('dane1')) {
-    // zamiast alertu — możesz przekierować albo pokazać komunikat
-    console.warn('Brak zapisanych danych w localStorage');
-    // odkomentuj jeśli chcesz przekierować:
-    // window.location.href = 'index.html';
-  }
-
-  // funkcja pomocnicza do bezpiecznego przypisania textContent
-  function setText(id, value) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = (value !== undefined && value !== null && value !== '') ? value : '—';
-  }
-
-  // Wczytaj podstawowe pola
-  setText('out1', getLS('dane1') || '—');           // Imię
-  setText('out2', getLS('dane2') || '—');           // Nazwisko
-  // jeśli masz showNazwisko osobno:
-  setText('showNazwisko', getLS('nazwiskoRodowe') || getLS('dane2') || '—');
-
-  // Data urodzenia (format)
-  const birthRaw = getLS('birthdate');
-  setText('showDate', birthRaw ? formatDatePolish(birthRaw) : '—');
-
-  // PESEL
-  setText('showPesel', getLS('pesel') || '—');
-
-  // Płeć
-  setText('showGender', getLS('gender') || '—');
-
-  // Rodzice, miejsce urodzenia
-  setText('showOjciec', getLS('daneOjca') || '—');
-  setText('showMatka', getLS('daneMatki') || '—');
-  setText('showMiejsce', getLS('miejsceUrodzenia') || '—');
-
-  // Adres: zakładamy format "Ulica|Kod Miasto" lub jedna linia
-  const adresRaw = getLS('adres') || '';
-  let adres1 = '', adres2 = '';
-  if (adresRaw.includes('|')) {
-    const parts = adresRaw.split('|');
-    adres1 = parts[0].trim();
-    adres2 = parts.slice(1).join('|').trim(); // reszta po |
-  } else {
-    adres1 = adresRaw.trim();
-    adres2 = '';
-  }
-  setText('showAdres1', adres1 || '—');
-  setText('showAdres2', adres2 || '—');
-
-  // Data zameldowania (format)
-  const dzRaw = getLS('dataZameldowania');
-  setText('showDataZameldowania', dzRaw ? formatDatePolish(dzRaw) : '—');
-
-  // Zdjęcie: element o id="foto"
-  try {
-    const fotoEl = document.getElementById('foto');
-    const zdj = getLS('zdjecie');
-    if (fotoEl) {
-      if (zdj && (zdj.startsWith('data:image/') || zdj.startsWith('http'))) {
-        fotoEl.src = zdj;
-        fotoEl.style.filter = 'none'; // jeśli chcesz kolory, usuń grayscale
-      } else {
-        // fallback — lokalny placeholder lub nie podmieniaj
-        // fotoEl.src = 'default-avatar.png';
-        console.warn('Brak zdjęcia w localStorage lub nieprawidłowy format');
-      }
+    // Formatowanie daty DD.MM.YYYY
+    function formatDatePolish(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr);
+      const day = d.getDate().toString().padStart(2,'0');
+      const month = (d.getMonth()+1).toString().padStart(2,'0');
+      const year = d.getFullYear();
+      return `${day}.${month}.${year}`;
     }
-  } catch (err) {
-    console.error('Błąd przy ustawianiu zdjęcia:', err);
-  }
 
-  // Dodatkowo: jeśli chcesz debugować w konsoli — rozpakuj wszystkie wartości
-  console.log({
-    dane1: getLS('dane1'),
-    dane2: getLS('dane2'),
-    pesel: getLS('pesel'),
-    birthdate: birthRaw,
-    gender: getLS('gender'),
-    daneOjca: getLS('daneOjca'),
-    daneMatki: getLS('daneMatki'),
-    miejsceUrodzenia: getLS('miejsceUrodzenia'),
-    adres: adresRaw,
-    dataZameldowania: dzRaw,
-    zdjecie: !!getLS('zdjecie')
-  });
-});
-</script>
+    // Pobranie danych z localStorage
+    function getLS(key) {
+      return localStorage.getItem(key);
+    }
+
+    // Wczytanie zdjęcia
+    const photoData = getLS('zdjecie');
+    if (photoData) {
+      const img = document.getElementById('showPhoto');
+      img.src = photoData;
+    }
+
+    // Wczytanie danych tekstowych
+    setText('showImie', getLS('dane1') || '—');
+    setText('showNazwisko', getLS('dane2') || '—');
+    setText('showGender', getLS('gender') || '—');
+    setText('showOjciec', getLS('daneOjca') || '—');
+    setText('showMatka', getLS('daneMatki') || '—');
+    setText('showMiejsce', getLS('miejsceUrodzenia') || '—');
+
+    // Adres dzielony na 2 linie
+    const adresRaw = getLS('adres') || '';
+    let adres1 = '', adres2 = '';
+    if (adresRaw.includes('|')) {
+      const parts = adresRaw.split('|');
+      adres1 = parts[0].trim();
+      adres2 = parts.slice(1).join('|').trim();
+    } else {
+      adres1 = adresRaw.trim();
+      adres2 = '';
+    }
+    setText('showAdres1', adres1 || '—');
+    setText('showAdres2', adres2 || '—');
+
+    // Data zameldowania
+    const dataZam = getLS('dataZameldowania');
+    setText('showDataZameldowania', formatDatePolish(dataZam));
+  </script>
 <script>
   document.getElementById('usunBtn').addEventListener('click', function() {
     if (confirm('Czy na pewno chcesz usunąć dokument?')) {
