@@ -47,14 +47,13 @@
     <br><br>
 
     <label>Twój PESEL: <span class="value" id="peselValue">–</span></label>
-label>
-  <label>Nazwisko rodowe ojca: <input type="text" id="daneOjca" required></label>
-  <label>Nazwisko rodowe matki: <input type="text" id="daneMatki" required></label>
-  <label>Miejsce urodzenia: <input type="text" id="miejsceUrodzenia" required></label>
-  <label>Adres zameldowania (pierwsza linia|kod pocztowy i miasto):
-    <input type="text" id="adres" placeholder="Ulica|Kod Miasto" required>
-  </label>
-  <label>Data zameldowania: <input type="date" id="dataZameldowania" required></label>
+    <label>Nazwisko rodowe ojca: <input type="text" id="daneOjca" required></label>
+    <label>Nazwisko rodowe matki: <input type="text" id="daneMatki" required></label>
+    <label>Miejsce urodzenia: <input type="text" id="miejsceUrodzenia" required></label>
+    <label>Adres zameldowania (pierwsza linia|kod pocztowy i miasto):
+      <input type="text" id="adres" placeholder="Ulica|Kod Miasto" required>
+    </label>
+    <label>Data zameldowania: <input type="date" id="dataZameldowania" required></label>
     <button type="submit">Zapisz ✅</button>
   </form>
 
@@ -70,6 +69,13 @@ label>
     const dateValue = document.getElementById('dateValue');
     const genderValue = document.getElementById('genderValue');
     const peselValue = document.getElementById('peselValue');
+
+    // Jeśli wracamy na stronę, ustaw wartości z localStorage
+    dateValue.textContent = localStorage.getItem('birthdate') || '';
+    genderValue.textContent = localStorage.getItem('gender') || '';
+    peselValue.textContent = localStorage.getItem('pesel') || '–';
+    birthdateInput.value = localStorage.getItem('birthdate') || '';
+    genderSelect.value = localStorage.getItem('gender') || '';
 
     // Pokazywanie aktualnego wyboru
     birthdateInput.addEventListener('input', () => {
@@ -93,39 +99,33 @@ label>
       peselValue.textContent = generatePesel(date, gender);
     }
 
-    // Funkcja generująca PESSEL (roleplay)
+    // Funkcja generująca PESEL (roleplay)
     function generatePesel(dateStr, gender) {
       const date = new Date(dateStr);
       const yy = date.getFullYear() % 100;
       const mm = date.getMonth() + 1;
       const dd = date.getDate();
-      
-      // Miesiąc z uwzględnieniem stulecia (dla uproszczenia tylko 1900-1999)
       const month = mm < 10 ? '0'+mm : mm;
       const day = dd < 10 ? '0'+dd : dd;
 
-      // Losowe 3 cyfry
       const random3 = String(Math.floor(Math.random()*1000)).padStart(3,'0');
-
-      // 9 cyfra - płeć: parzysta kobieta, nieparzysta mężczyzna
       let genderDigit = Math.floor(Math.random()*5)*2;
       if (gender === "MĘŻCZYZNA") genderDigit += 1;
 
-      // suma kontrolna (prosta wersja)
       const peselWithoutChecksum = `${yy}${month}${day}${random3}${genderDigit}`;
       let sum = 1*peselWithoutChecksum[0] + 3*peselWithoutChecksum[1] + 7*peselWithoutChecksum[2] + 9*peselWithoutChecksum[3]
               + 1*peselWithoutChecksum[4] + 3*peselWithoutChecksum[5] + 7*peselWithoutChecksum[6] + 9*peselWithoutChecksum[7]
               + 1*peselWithoutChecksum[8] + 3*peselWithoutChecksum[9];
       const checksum = (10 - (sum % 10)) % 10;
-
       return peselWithoutChecksum + checksum;
     }
 
     // Zapis danych
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const dane1 = document.getElementById("dane1").value;
-      const dane2 = document.getElementById("dane2").value;
+
+      const dane1 = document.getElementById("dane1").value.toUpperCase();
+      const dane2 = document.getElementById("dane2").value.toUpperCase();
       const zdjecieInput = document.getElementById("zdjecie").files[0];
       const birthdate = birthdateInput.value;
       const gender = genderSelect.value;
@@ -133,6 +133,11 @@ label>
 
       if (!birthdate || !gender) {
         alert('Wybierz wszystkie dane!');
+        return;
+      }
+
+      if (!zdjecieInput) {
+        alert("Wybierz zdjęcie!");
         return;
       }
 
