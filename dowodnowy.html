@@ -239,33 +239,36 @@
     <p class="czas">Czas: 20:49:19 3.03.2025</p>
     <script src="./dowodnowy_files/timenew.js.pobrane"></script>
     <main>
-<section id="lew">
-    <!-- Tutaj dynamicznie podmienimy obrazek -->
-    <img src="./dowodnowy_files/image0.jpg" class="object-contain w-full rounded-lg photo" style="margin: 0;" alt="Brak Zdjęcia" id="foto">
-
-    <br>
-    <img src="./dowodnowy_files/flaga.gif" alt="flaga" id="flaga" style="margin: 0;">
-    <div id="rzecz">
-        <img src="./dowodnowy_files/godlo.gif" alt="godlo" id="godlo">
-        <p>Rzeczpospolita<br>Polska</p>
-    </div>
+<!-- ZASTĄP swoim HTML-em sekcje #lew i #praw tym kodem -->
+<section id="lew" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+  <!-- Domyślne zdjęcie (jeśli nie ma w localStorage) -->
+  <img src="./dowodnowy_files/image0.jpg"
+       class="object-contain w-full rounded-lg photo"
+       style="margin: 0; width: 180px; height: 220px; object-fit: cover; border-radius:8px; border:1px solid #ccc;"
+       alt="Brak Zdjęcia"
+       id="foto">
+  <img src="./dowodnowy_files/flaga.gif" alt="flaga" id="flaga" style="margin: 0; width:60px;">
+  <div id="rzecz" style="display:flex;align-items:center;gap:8px;">
+    <img src="./dowodnowy_files/godlo.gif" alt="godlo" id="godlo" style="width:40px;">
+    <p style="margin:0;">Rzeczpospolita<br>Polska</p>
+  </div>
 </section>
 
-<section id="praw">
-    <p class="main" id="out1">—</p>
-    <p class="sub">Imię (Imiona)</p><br>
+<section id="praw" style="margin-top:16px;">
+  <p class="main" id="out1">—</p>
+  <p class="sub">Imię (Imiona)</p><br>
 
-    <p class="main" id="out2">—</p>
-    <p class="sub">Nazwisko</p><br>
+  <p class="main" id="out2">—</p>
+  <p class="sub">Nazwisko</p><br>
 
-    <p class="main">POLSKIE</p>
-    <p class="sub">Obywatelstwo</p><br>
+  <p class="main">POLSKIE</p>
+  <p class="sub">Obywatelstwo</p><br>
 
-    <p class="main" id="showDate">—</p>
-    <p class="sub">Data urodzenia</p><br>
+  <p class="main" id="showDate">—</p>
+  <p class="sub">Data urodzenia</p><br>
 
-    <p class="main" id="showPesel">—</p>
-    <p class="sub">Numer PESEL</p><br>
+  <p class="main" id="showPesel">—</p>
+  <p class="sub">Numer PESEL</p><br>
 </section>
     </main>
   <section id="bottom">
@@ -574,20 +577,14 @@
 
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
   // Jeśli brak danych → wróć na formularz
   if (!localStorage.getItem("dane1")) {
-      window.location.href = "index.html";
+    window.location.href = "index.html";
+    return;
   }
 
-  // Podstawienie danych do elementów
-  document.getElementById("out1").textContent = localStorage.getItem("dane1"); // imię
-  document.getElementById("out2").textContent = localStorage.getItem("dane2"); // nazwisko
-  document.getElementById("out3").textContent = localStorage.getItem("dane3"); // data urodzenia
-
-  document.getElementById('showDate').textContent = localStorage.getItem('birthdate') || 'Nie wybrano';
-  document.getElementById('showGender').textContent = localStorage.getItem('gender') || 'Nie wybrano';
-
-<script>
+  // Funkcja formatowania daty DD.MM.YYYY
   function formatDatePolish(dateStr) {
     if (!dateStr) return 'Nie podano';
     const d = new Date(dateStr);
@@ -599,26 +596,24 @@
   }
 
   // Pobieramy dane z localStorage
-  const imie = localStorage.getItem('dane1') || '';
-  const nazwisko = localStorage.getItem('dane2') || '';
+  const imie = localStorage.getItem('dane1') || 'Nie podano';
+  const nazwisko = localStorage.getItem('dane2') || 'Nie podano';
   const birthdate = localStorage.getItem('birthdate') || '';
-  const pesel = localStorage.getItem('pesel') || '';
+  const pesel = localStorage.getItem('pesel') || 'Nie podano';
   const zdjecieDataUrl = localStorage.getItem('zdjecie') || null;
 
-  // Wstawiamy dane w odpowiedniej kolejności
-  document.getElementById('out1').textContent = imie ? imie : 'Nie podano';
-  document.getElementById('out2').textContent = nazwisko ? nazwisko : 'Nie podano';
+  // Wstawiamy dane do elementów
+  document.getElementById('out1').textContent = imie;
+  document.getElementById('out2').textContent = nazwisko;
   document.getElementById('showDate').textContent = birthdate ? formatDatePolish(birthdate) : 'Nie podano';
-  document.getElementById('showPesel').textContent = pesel ? pesel : 'Nie podano';
+  document.getElementById('showPesel').textContent = pesel;
 
-  // Zdjęcie w sekcji #lew
+  // Podmiana zdjęcia w sekcji #lew
   const fotoImg = document.getElementById('foto');
-  if (zdjecieDataUrl && typeof zdjecieDataUrl === 'string' && zdjecieDataUrl.startsWith('data:image/')) {
-      fotoImg.src = zdjecieDataUrl;
+  if (zdjecieDataUrl && zdjecieDataUrl.startsWith('data:image/')) {
+    fotoImg.src = zdjecieDataUrl;
   }
-</script>
-  // Podmiana obrazka
-  document.getElementById("foto").src = localStorage.getItem("zdjecie");
+});
 </script>
 <script>
   document.getElementById('usunBtn').addEventListener('click', function() {
