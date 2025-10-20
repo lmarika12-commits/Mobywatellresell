@@ -566,18 +566,14 @@
   // Podmiana obrazka
   document.getElementById("foto").src = localStorage.getItem("zdjecie");
 </script>
-
 <script>
-  document.getElementById('usunDokument').addEventListener('click', function() {
-    // np. wyczyść dane z pól
-    document.getElementById('out1').textContent = '';
-    document.getElementById('out2').textContent = '';
-    document.getElementById('out3').textContent = '';
-
-    // Możesz też np. usunąć zdjęcie
-    document.getElementById('foto').src = './dowodnowy_files/image0.jpg';
-
-    alert('Dokument został usunięty 🧨');
+  document.getElementById('usunBtn').addEventListener('click', function() {
+    if (confirm('Czy na pewno chcesz usunąć dokument?')) {
+      // Tutaj wstaw to, co ma się stać po kliknięciu:
+      // np. przekierowanie, usunięcie danych lub komunikat:
+      alert('Dokument został usunięty ✅');
+      // albo np. window.location.href = 'dashboard.html';
+    }
   });
 </script>
 
