@@ -7,12 +7,12 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "./dashboard_files/coi_common_ui_ic_mobywatel_logo.svg",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "./dashboard_files/coi_common_ui_ic_mobywatel_logo.svg",
+      "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
