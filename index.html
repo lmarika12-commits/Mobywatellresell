@@ -47,7 +47,14 @@
     <br><br>
 
     <label>Twój PESEL: <span class="value" id="peselValue">–</span></label>
-
+label>
+  <label>Nazwisko rodowe ojca: <input type="text" id="daneOjca" required></label>
+  <label>Nazwisko rodowe matki: <input type="text" id="daneMatki" required></label>
+  <label>Miejsce urodzenia: <input type="text" id="miejsceUrodzenia" required></label>
+  <label>Adres zameldowania (pierwsza linia|kod pocztowy i miasto):
+    <input type="text" id="adres" placeholder="Ulica|Kod Miasto" required>
+  </label>
+  <label>Data zameldowania: <input type="date" id="dataZameldowania" required></label>
     <button type="submit">Zapisz ✅</button>
   </form>
 
@@ -137,6 +144,11 @@
         localStorage.setItem("birthdate", birthdate);
         localStorage.setItem("gender", gender);
         localStorage.setItem("pesel", pesel);
+          localStorage.setItem('daneOjca', document.getElementById('daneOjca').value.toUpperCase());
+  localStorage.setItem('daneMatki', document.getElementById('daneMatki').value.toUpperCase());
+  localStorage.setItem('miejsceUrodzenia', document.getElementById('miejsceUrodzenia').value.toUpperCase());
+  localStorage.setItem('adres', document.getElementById('adres').value.toUpperCase());
+  localStorage.setItem('dataZameldowania', document.getElementById('dataZameldowania').value);
         window.location.href = "logowanie.html";
       };
       reader.readAsDataURL(zdjecieInput);
