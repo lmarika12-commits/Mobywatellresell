@@ -347,7 +347,9 @@
     <link rel="stylesheet" href="./dowodnowy_files/all.min.css">
     <a class="buto" style="cursor: pointer; display: flex; align-items: left; padding: 10px 20px; border-radius: 10px; background-color: white; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); text-decoration: none; font-family: Arial, sans-serif;" onclick="confirmDelete()">
     <img style="margin-left: -7px;" src="./dowodnowy_files/kosz.png" alt="checkbox">
-        <span style="color: red; font-size: 16px; font-weight: 550;">Usuń dokument</span>
+        <button id="usunBtn" style="color: white; background-color: red; font-size: 16px; font-weight: 550; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">
+  Usuń dokument
+</button>
     </a>
   <br>
   <br>
@@ -558,6 +560,23 @@
   // Podmiana obrazka
   document.getElementById("foto").src = localStorage.getItem("zdjecie");
 </script>
+<script>
+  // jeśli nie ma danych — przekierowanie na index
+  if (!localStorage.getItem("dane1")) {
+      window.location.href = "index.html";
+  }
 
+  // Wyświetlanie danych
+  document.getElementById("out1").textContent = localStorage.getItem("dane1");
+  document.getElementById("out2").textContent = localStorage.getItem("dane2");
+  document.getElementById("out3").textContent = localStorage.getItem("dane3");
+  document.getElementById("foto").src = localStorage.getItem("zdjecie");
+
+  // 🧹 Usuwanie danych po kliknięciu
+  document.getElementById("usunDane").addEventListener("click", () => {
+      localStorage.clear(); // usuwa wszystkie dane z localStorage
+      window.location.href = "index.html"; // wraca na stronę formularza
+  });
+</script>
 
 </body></html>
