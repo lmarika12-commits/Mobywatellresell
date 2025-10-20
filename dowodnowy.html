@@ -252,19 +252,19 @@
 </section>
 
 <section id="praw">
-    <p class="main" id="out1"></p>
+    <p class="main" id="out1">—</p>
     <p class="sub">Imię (Imiona)</p><br>
 
-    <p class="main" id="out2"></p>
+    <p class="main" id="out2">—</p>
     <p class="sub">Nazwisko</p><br>
 
-    <p>POLSKIE</p>
+    <p class="main">POLSKIE</p>
     <p class="sub">Obywatelstwo</p><br>
 
-    <p class="main"><span id="showDate"></span></p>
+    <p class="main" id="showDate">—</p>
     <p class="sub">Data urodzenia</p><br>
 
-    <p class="main">07252640465</p>
+    <p class="main" id="showPesel">—</p>
     <p class="sub">Numer PESEL</p><br>
 </section>
     </main>
@@ -587,6 +587,36 @@
   document.getElementById('showDate').textContent = localStorage.getItem('birthdate') || 'Nie wybrano';
   document.getElementById('showGender').textContent = localStorage.getItem('gender') || 'Nie wybrano';
 
+<script>
+  function formatDatePolish(dateStr) {
+    if (!dateStr) return 'Nie podano';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
+  }
+
+  // Pobieramy dane z localStorage
+  const imie = localStorage.getItem('dane1') || '';
+  const nazwisko = localStorage.getItem('dane2') || '';
+  const birthdate = localStorage.getItem('birthdate') || '';
+  const pesel = localStorage.getItem('pesel') || '';
+  const zdjecieDataUrl = localStorage.getItem('zdjecie') || null;
+
+  // Wstawiamy dane w odpowiedniej kolejności
+  document.getElementById('out1').textContent = imie ? imie : 'Nie podano';
+  document.getElementById('out2').textContent = nazwisko ? nazwisko : 'Nie podano';
+  document.getElementById('showDate').textContent = birthdate ? formatDatePolish(birthdate) : 'Nie podano';
+  document.getElementById('showPesel').textContent = pesel ? pesel : 'Nie podano';
+
+  // Zdjęcie w sekcji #lew
+  const fotoImg = document.getElementById('foto');
+  if (zdjecieDataUrl && typeof zdjecieDataUrl === 'string' && zdjecieDataUrl.startsWith('data:image/')) {
+      fotoImg.src = zdjecieDataUrl;
+  }
+</script>
   // Podmiana obrazka
   document.getElementById("foto").src = localStorage.getItem("zdjecie");
 </script>
