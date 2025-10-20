@@ -572,6 +572,8 @@
       // Tutaj wstaw to, co ma się stać po kliknięciu:
       // np. przekierowanie, usunięcie danych lub komunikat:
       alert('Dokument został usunięty ✅');
+      localStorage.clear(); // 🧽 usuwa wszystkie zapisane dane
+      window.location.href = 'index.html'; 
       // albo np. window.location.href = 'dashboard.html';
     }
   });
