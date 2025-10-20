@@ -560,22 +560,18 @@
   // Podmiana obrazka
   document.getElementById("foto").src = localStorage.getItem("zdjecie");
 </script>
+
 <script>
-  // jeśli nie ma danych — przekierowanie na index
-  if (!localStorage.getItem("dane1")) {
-      window.location.href = "index.html";
-  }
+  document.getElementById('usunDokument').addEventListener('click', function() {
+    // np. wyczyść dane z pól
+    document.getElementById('out1').textContent = '';
+    document.getElementById('out2').textContent = '';
+    document.getElementById('out3').textContent = '';
 
-  // Wyświetlanie danych
-  document.getElementById("out1").textContent = localStorage.getItem("dane1");
-  document.getElementById("out2").textContent = localStorage.getItem("dane2");
-  document.getElementById("out3").textContent = localStorage.getItem("dane3");
-  document.getElementById("foto").src = localStorage.getItem("zdjecie");
+    // Możesz też np. usunąć zdjęcie
+    document.getElementById('foto').src = './dowodnowy_files/image0.jpg';
 
-  // 🧹 Usuwanie danych po kliknięciu
-  document.getElementById("usunDane").addEventListener("click", () => {
-      localStorage.clear(); // usuwa wszystkie dane z localStorage
-      window.location.href = "index.html"; // wraca na stronę formularza
+    alert('Dokument został usunięty 🧨');
   });
 </script>
 
