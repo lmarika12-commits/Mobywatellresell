@@ -1,1 +1,55 @@
 
+!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Moja apka</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    body { font-family: Arial; max-width: 400px; margin: auto; padding: 20px; }
+    label { display: block; margin-top: 15px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Wpisz dane 📥</h1>
+  <form id="daneForm">
+    <label>Imię: <input type="text" id="dane1" required></label>
+    <label>Nazwisko: <input type="text" id="dane2" required></label>
+    <label>Data urodzenia (DD.MM.YYYY): <input type="text" id="dane3" required></label>
+    <label>Twoje zdjęcie: <input type="file" id="zdjecie" accept="image/*" required></label>
+    <button type="submit">Zapisz ✅</button>
+  </form>
+
+  <script>
+    // Jeśli dane już są — przekieruj na podstronę
+    if (localStorage.getItem("dane1")) {
+      window.location.href = "podglad.html";
+    }
+
+    const form = document.getElementById("daneForm");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const dane1 = document.getElementById("dane1").value;
+      const dane2 = document.getElementById("dane2").value;
+      const dane3 = document.getElementById("dane3").value;
+      const zdjecieInput = document.getElementById("zdjecie").files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem("dane1", dane1);
+        localStorage.setItem("dane2", dane2);
+        localStorage.setItem("dane3", dane3);
+        localStorage.setItem("zdjecie", reader.result);
+        window.location.href = "podglad.html";
+      };
+      reader.readAsDataURL(zdjecieInput);
+    });
+  </script>
+</body>
+</html>
