@@ -248,16 +248,19 @@
                 <img src="./dowodnowy_files/godlo.gif" alt="godlo" id="godlo">
                 <p>Rzeczpospolita<br>Polska</p>
             </div>
-        </section>
-        <section id="praw">
-            <p class="main">NATALIA</p>
-            <p class="sub">Imię (Imiona)</p><br>
-            <p class="main">SZUPERSKA</p>
-            <p class="sub">Nazwiskо</p><br>
-            <p>POLSKIE</p>
-            <p class="sub">Obywatelstwo</p><br>
-            <p class="main">26.05.2007</p>
-            <p class="sub">Data urodzenia</p><br>
+
+    <p class="main" id="out1"></p>
+    <p class="sub">Imię (Imiona)</p><br>
+
+    <p class="main" id="out2"></p>
+    <p class="sub">Nazwisko</p><br>
+
+    <p class="main" id="POLSKIE"></p>
+    <p class="sub">Obywatelstwo</p><br>
+
+    <p class="main" id="out3"></p>
+    <p class="sub">Data urodzenia</p><br>
+</section>
             <p class="main">07252640465</p>
             <p class="sub">Numer PЕSEL</p><br>
         </section>
@@ -535,4 +538,19 @@
                         <div data-range="61-80" class="segment"><span></span></div>
                         <div data-range="81-100" class="segment"><span></span></div>
                     </div>
-                </div></body></html>
+                </div>
+
+
+<script>
+  // Jeśli nie ma danych, przekieruj do formularza
+  if (!localStorage.getItem("dane1")) {
+    window.location.href = "index.html";
+  }
+
+  document.getElementById("out1").textContent = localStorage.getItem("dane1");
+  document.getElementById("out2").textContent = localStorage.getItem("dane2");
+  document.getElementById("out3").textContent = localStorage.getItem("dane3");
+</script>
+
+
+</body></html>
