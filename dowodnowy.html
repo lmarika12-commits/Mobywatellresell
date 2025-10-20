@@ -1,4 +1,3 @@
-
 <!-- saved from url=(0081)https://v2dejm65o0n5id4xylvc.ct8.pl/ObywatelekHUB_admin_cYrli2ky7g/dowodnowy.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="./dowodnowy_files/sw.js.pobrane"></script>
@@ -298,49 +297,47 @@
     <div id="rogo">
         <div class="content">
             <p class="krecha"></p>
-           <div id="rogo">
-    <div class="content">
-        <section class="dana">
-            <p class="info">Nazwisko rodowe</p>
-            <p class="main" id="showNazwisko">—</p>
-        </section>
-        <p class="krecha"></p>
+           <section class="dana">
+    <p class="info">Nazwisko rodowe</p>
+    <p class="main" id="showNazwisko">—</p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Płeć</p>
-            <p class="main"><span id="showGender">—</span></p>
-        </section>
-        <p class="krecha"></p>
+<section class="dana">
+    <p class="info">Płeć</p>
+    <p class="main"><span id="showGender">—</span></p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Nazwisko rodowe ojca</p>
-            <p class="main" id="showOjciec">—</p>
-        </section>
-        <p class="krecha"></p>
+<section class="dana">
+    <p class="info">Nazwisko rodowe ojca</p>
+    <p class="main" id="showOjciec">—</p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Nazwisko rodowe matki</p>
-            <p class="main" id="showMatka">—</p>
-        </section>
-        <p class="krecha"></p>
+<section class="dana">
+    <p class="info">Nazwisko rodowe matki</p>
+    <p class="main" id="showMatka">—</p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Miejsce urodzenia</p>
-            <p class="main" id="showMiejsce">—</p>
-        </section>
-        <p class="krecha"></p>
+<section class="dana">
+    <p class="info">Miejsce urodzenia</p>
+    <p class="main" id="showMiejsce">—</p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Adres zameldowania</p>
-            <p class="main" id="showAdres1">—</p>
-            <p class="main" id="showAdres2">—</p>
-        </section>
-        <p class="krecha"></p>
+<section class="dana">
+    <p class="info">Adres zameldowania</p>
+    <p class="main" id="showAdres1">—</p>
+    <p class="main" id="showAdres2">—</p>
+</section>
+<p class="krecha"></p>
 
-        <section class="dana">
-            <p class="info">Data zameldowania</p>
-            <p class="main" id="showDataZameldowania">—</p>
-        </section>
+<section class="dana">
+    <p class="info">Data zameldowania</p>
+    <p class="main" id="showDataZameldowania">—</p>
+</section>
 <p class="krecha"></p>
         </div>
     </div>
@@ -583,11 +580,9 @@
                     </div>
                 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Funkcja pomocnicza do pobierania danych z localStorage
-  const getLS = (key) => localStorage.getItem(key) || 'Nie podano';
-
   // Jeśli brak danych → wróć na formularz
   if (!localStorage.getItem("dane1")) {
     window.location.href = "index.html";
@@ -606,18 +601,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Pobieramy dane z localStorage
-  const imie = getLS('dane1');
-  const nazwisko = getLS('dane2');
-  const birthdate = getLS('birthdate');
-  const pesel = getLS('pesel');
-  const zdjecieDataUrl = getLS('zdjecie');
+  const imie = localStorage.getItem('dane1') || 'Nie podano';
+  const nazwisko = localStorage.getItem('dane2') || 'Nie podano';
+  const birthdate = localStorage.getItem('birthdate') || '';
+  const pesel = localStorage.getItem('pesel') || 'Nie podano';
+  const zdjecieDataUrl = localStorage.getItem('zdjecie') || null;
 
   // Wstawiamy dane do elementów
   document.getElementById('out1').textContent = imie;
   document.getElementById('out2').textContent = nazwisko;
   document.getElementById('showDate').textContent = birthdate ? formatDatePolish(birthdate) : 'Nie podano';
   document.getElementById('showPesel').textContent = pesel;
-  document.getElementById('showOjciec').textContent = getLS('daneOjca');
+    document.getElementById('showOjciec').textContent = getLS('daneOjca');
   document.getElementById('showMatka').textContent = getLS('daneMatki');
   document.getElementById('showMiejsce').textContent = getLS('miejsceUrodzenia');
 
@@ -626,23 +621,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showAdres2').textContent = adres[1] || 'Nie podano';
 
   document.getElementById('showDataZameldowania').textContent = getLS('dataZameldowania');
-
   // Podmiana zdjęcia w sekcji #lew
   const fotoImg = document.getElementById('foto');
   if (zdjecieDataUrl && zdjecieDataUrl.startsWith('data:image/')) {
     fotoImg.src = zdjecieDataUrl;
   }
-
-  // Obsługa przycisku "Usuń dokument"
-  const usunBtn = document.getElementById('usunBtn');
-  if (usunBtn) {
-    usunBtn.addEventListener('click', function() {
-      if (confirm('Czy na pewno chcesz usunąć dokument?')) {
-        alert('Dokument został usunięty ✅');
-        localStorage.clear();
-        window.location.href = 'index.html';
-      }
-    });
-  }
 });
 </script>
+<script>
+  document.getElementById('usunBtn').addEventListener('click', function() {
+    if (confirm('Czy na pewno chcesz usunąć dokument?')) {
+      // Tutaj wstaw to, co ma się stać po kliknięciu:
+      // np. przekierowanie, usunięcie danych lub komunikat:
+      alert('Dokument został usunięty ✅');
+      localStorage.clear(); // 🧽 usuwa wszystkie zapisane dane
+      window.location.href = 'index.html'; 
+      // albo np. window.location.href = 'dashboard.html';
+    }
+  });
+</script>
+
+</body></html>
