@@ -261,7 +261,7 @@
     <p>POLSKIE</p>
     <p class="sub">Obywatelstwo</p><br>
 
-    <p class="main" id="out3"></p>
+    <p class="main"><span id="showDate"></span></p>
     <p class="sub">Data urodzenia</p><br>
 
     <p class="main">07252640465</p>
@@ -302,7 +302,7 @@
             <p class="krecha"></p>
             <section class="dana">
                 <p class="info">Płеć</p>
-                <p class="main">Kobieta</p>
+                <p class="main"><span id="showGender"></span></p>
             </section>
             <p class="krecha"></p>
             <section class="dana">
@@ -583,6 +583,9 @@
   document.getElementById("out1").textContent = localStorage.getItem("dane1"); // imię
   document.getElementById("out2").textContent = localStorage.getItem("dane2"); // nazwisko
   document.getElementById("out3").textContent = localStorage.getItem("dane3"); // data urodzenia
+
+  document.getElementById('showDate').textContent = localStorage.getItem('birthdate') || 'Nie wybrano';
+  document.getElementById('showGender').textContent = localStorage.getItem('gender') || 'Nie wybrano';
 
   // Podmiana obrazka
   document.getElementById("foto").src = localStorage.getItem("zdjecie");
