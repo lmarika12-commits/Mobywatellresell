@@ -622,43 +622,78 @@
       return `${day}.${month}.${year}`;
     }
 
-    // Pobranie danych z localStorage
-    function getLS(key) {
-      return localStorage.getItem(key);
-    }
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("📦 Ładowanie danych z localStorage...");
 
-    // Wczytanie zdjęcia
-    const photoData = getLS('zdjecie');
-    if (photoData) {
-      const img = document.getElementById('showPhoto');
-      img.src = photoData;
-    }
+  // Funkcja pomocnicza
+  const getLS = (key) => localStorage.getItem(key) || '';
 
-    // Wczytanie danych tekstowych
-    setText('showImie', getLS('dane1') || '—');
-    setText('showNazwisko', getLS('dane2') || '—');
-    setText('showGender', getLS('gender') || '—');
-    setText('showOjciec', getLS('daneOjca') || '—');
-    setText('showMatka', getLS('daneMatki') || '—');
-    setText('showMiejsce', getLS('miejsceUrodzenia') || '—');
+  // Jeśli brak kluczowych danych → wróć na index.html
+  if (!getLS("dane1") || !getLS("dane2")) {
+    console.warn("⚠️ Brak danych — przekierowanie do index.html");
+    window.location.href = "index.html";
+    return;
+  }
 
-    // Adres dzielony na 2 linie
-    const adresRaw = getLS('adres') || '';
-    let adres1 = '', adres2 = '';
-    if (adresRaw.includes('|')) {
-      const parts = adresRaw.split('|');
-      adres1 = parts[0].trim();
-      adres2 = parts.slice(1).join('|').trim();
+  // Formatowanie daty (z yyyy-mm-dd → dd.mm.yyyy)
+  function formatDatePolish(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+  }
+
+  // Dane z localStorage
+  const dane = {
+    imie: getLS('dane1'),
+    nazwisko: getLS('dane2'),
+    birthdate: getLS('birthdate'),
+    pesel: getLS('pesel'),
+    daneOjca: getLS('daneOjca'),
+    daneMatki: getLS('daneMatki'),
+    miejsceUrodzenia: getLS('miejsceUrodzenia'),
+    adres: getLS('adres'),
+    dataZameldowania: getLS('dataZameldowania'),
+    zdjecie: getLS('zdjecie'),
+  };
+
+  console.log("✅ Dane znalezione:", dane);
+
+  // Wstaw dane do HTML
+  if (document.getElementById('out1')) document.getElementById('out1').textContent = dane.imie;
+  if (document.getElementById('out2')) document.getElementById('out2').textContent = dane.nazwisko;
+  if (document.getElementById('showDate')) document.getElementById('showDate').textContent = formatDatePolish(dane.birthdate);
+  if (document.getElementById('showPesel')) document.getElementById('showPesel').textContent = dane.pesel;
+
+  if (document.getElementById('showOjciec')) document.getElementById('showOjciec').textContent = dane.daneOjca;
+  if (document.getElementById('showMatka')) document.getElementById('showMatka').textContent = dane.daneMatki;
+  if (document.getElementById('showMiejsce')) document.getElementById('showMiejsce').textContent = dane.miejsceUrodzenia;
+
+  // Adres
+  if (dane.adres && dane.adres.includes('|')) {
+    const [linia1, linia2] = dane.adres.split('|');
+    if (document.getElementById('showAdres1')) document.getElementById('showAdres1').textContent = linia1.trim();
+    if (document.getElementById('showAdres2')) document.getElementById('showAdres2').textContent = linia2.trim();
+  }
+
+  if (document.getElementById('showDataZameldowania')) {
+    document.getElementById('showDataZameldowania').textContent = formatDatePolish(dane.dataZameldowania);
+  }
+
+  // Zdjęcie
+  const fotoImg = document.getElementById('foto');
+  if (fotoImg) {
+    if (dane.zdjecie && dane.zdjecie.startsWith('data:image/')) {
+      fotoImg.src = dane.zdjecie;
     } else {
-      adres1 = adresRaw.trim();
-      adres2 = '';
+      fotoImg.src = '';
+      fotoImg.alt = 'Brak zdjęcia';
+      fotoImg.style.background = '#eee url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'180\' height=\'220\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23eee\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'14\' fill=\'%23999\'%3EBrak zdjęcia%3C/text%3E%3C/svg%3E") no-repeat center';
     }
-    setText('showAdres1', adres1 || '—');
-    setText('showAdres2', adres2 || '—');
+  }
 
-    // Data zameldowania
-    const dataZam = getLS('dataZameldowania');
-    setText('showDataZameldowania', formatDatePolish(dataZam));
+
   </script>
 <script>
   document.getElementById('usunBtn').addEventListener('click', function() {
