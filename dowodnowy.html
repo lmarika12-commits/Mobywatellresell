@@ -604,77 +604,53 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("📦 Ładowanie danych z localStorage...");
-
-  // Funkcja pomocnicza
-  const getLS = (key) => localStorage.getItem(key) || '';
-
-  // Jeśli brak kluczowych danych → wróć na index.html
-  if (!getLS("dane1") || !getLS("dane2")) {
-    console.warn("⚠️ Brak danych — przekierowanie do index.html");
+  // Jeśli brak danych → wróć na formularz
+  if (!localStorage.getItem("dane1")) {
     window.location.href = "index.html";
     return;
   }
 
-  // Formatowanie daty (z yyyy-mm-dd → dd.mm.yyyy)
+  // 🧠 Funkcja formatująca datę
   function formatDatePolish(dateStr) {
-    if (!dateStr) return '';
+    if (!dateStr) return 'Nie podano';
     const d = new Date(dateStr);
     if (isNaN(d)) return dateStr;
-    return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
   }
 
-  // Dane z localStorage
-  const dane = {
-    imie: getLS('dane1'),
-    nazwisko: getLS('dane2'),
-    birthdate: getLS('birthdate'),
-    pesel: getLS('pesel'),
-    daneOjca: getLS('daneOjca'),
-    daneMatki: getLS('daneMatki'),
-    miejsceUrodzenia: getLS('miejsceUrodzenia'),
-    adres: getLS('adres'),
-    dataZameldowania: getLS('dataZameldowania'),
-    zdjecie: getLS('zdjecie'),
-  };
+  // 🗃️ Funkcja pomocnicza do odczytu localStorage
+  const getLS = key => localStorage.getItem(key) || 'Nie podano';
 
-  console.log("✅ Dane znalezione:", dane);
+  // ✨ Podstawowe dane (prawa strona)
+  document.getElementById('out1').textContent = getLS('dane1');
+  document.getElementById('out2').textContent = getLS('dane2');
+  document.getElementById('showDate').textContent = formatDatePolish(getLS('birthdate'));
+  document.getElementById('showPesel').textContent = getLS('pesel');
+  document.getElementById('showGender').textContent = getLS('gender');
 
-  // Wstaw dane do HTML
-  if (document.getElementById('out1')) document.getElementById('out1').textContent = dane.imie;
-  if (document.getElementById('out2')) document.getElementById('out2').textContent = dane.nazwisko;
-  if (document.getElementById('showDate')) document.getElementById('showDate').textContent = formatDatePolish(dane.birthdate);
-  if (document.getElementById('showPesel')) document.getElementById('showPesel').textContent = dane.pesel;
+  // 📜 Dodatkowe dane (dolna część)
+  document.getElementById('showNazwisko').textContent = getLS('dane2');
+  document.getElementById('showOjciec').textContent = getLS('daneOjca');
+  document.getElementById('showMatka').textContent = getLS('daneMatki');
+  document.getElementById('showMiejsce').textContent = getLS('miejsceUrodzenia');
 
-  if (document.getElementById('showOjciec')) document.getElementById('showOjciec').textContent = dane.daneOjca;
-  if (document.getElementById('showMatka')) document.getElementById('showMatka').textContent = dane.daneMatki;
-  if (document.getElementById('showMiejsce')) document.getElementById('showMiejsce').textContent = dane.miejsceUrodzenia;
+  const adres = getLS('adres').split('|');
+  document.getElementById('showAdres1').textContent = adres[0] || 'Nie podano';
+  document.getElementById('showAdres2').textContent = adres[1] || '';
 
-  // Adres
-  if (dane.adres && dane.adres.includes('|')) {
-    const [linia1, linia2] = dane.adres.split('|');
-    if (document.getElementById('showAdres1')) document.getElementById('showAdres1').textContent = linia1.trim();
-    if (document.getElementById('showAdres2')) document.getElementById('showAdres2').textContent = linia2.trim();
-  }
+  document.getElementById('showDataZameldowania').textContent = formatDatePolish(getLS('dataZameldowania'));
 
-  if (document.getElementById('showDataZameldowania')) {
-    document.getElementById('showDataZameldowania').textContent = formatDatePolish(dane.dataZameldowania);
-  }
-
-  // Zdjęcie
+  // 🖼️ Zdjęcie
   const fotoImg = document.getElementById('foto');
-  if (fotoImg) {
-    if (dane.zdjecie && dane.zdjecie.startsWith('data:image/')) {
-      fotoImg.src = dane.zdjecie;
-    } else {
-      fotoImg.src = '';
-      fotoImg.alt = 'Brak zdjęcia';
-      fotoImg.style.background = '#eee url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'180\' height=\'220\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23eee\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-size=\'14\' fill=\'%23999\'%3EBrak zdjęcia%3C/text%3E%3C/svg%3E") no-repeat center';
-    }
+  const zdjecieDataUrl = localStorage.getItem('zdjecie');
+  if (zdjecieDataUrl && zdjecieDataUrl.startsWith('data:image/')) {
+    fotoImg.src = zdjecieDataUrl;
   }
 
-
-  </script>
+  // 🧹 Usuwanie danych
 <script>
   document.getElementById('usunBtn').addEventListener('click', function() {
     if (confirm('Czy na pewno chcesz usunąć dokument?')) {
