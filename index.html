@@ -18,146 +18,62 @@
   </style>
 </head>
 <body>
-  <h1>Wpisz dane 📥</h1>
-  <p>Instrukcja: 
-    <br>1. Wpisz wszystkie dane z caps lockiem
-    <br>2. Kliknij "Zapisz"
-    <br>3. Naciśnij "Udostępnij" na swojej przeglądarce
-    <br>4. Naciśnij "Dodaj do ekranu głównego"
-  </p>
+  <h2>Wprowadź dane do dowodu</h2>
 
-  <form id="daneForm">
-    <label>Imię: <input type="text" id="dane1" required></label>
-    <label>Nazwisko: <input type="text" id="dane2" required></label>
-    <label>Twoje zdjęcie: <input type="file" id="zdjecie" accept="image/*" required></label>
+  <input id="imie" placeholder="Imię">
+  <input id="nazwisko" placeholder="Nazwisko">
+  <input id="birthdate" type="date" placeholder="Data urodzenia">
+  <input id="pesel" placeholder="PESEL">
+  <input id="ojciec" placeholder="Imię ojca">
+  <input id="matka" placeholder="Imię matki">
+  <input id="miejsce" placeholder="Miejsce urodzenia">
+  <input id="adres1" placeholder="Ulica i nr domu">
+  <input id="adres2" placeholder="Kod i miejscowość">
+  <input id="dataZameldowania" type="date" placeholder="Data zameldowania">
+  
+  <label>Zdjęcie: </label>
+  <input type="file" id="zdjecie" accept="image/*">
 
-    <h2>Wybierz datę urodzenia</h2>
-    <label for="birthdate">Data: <span class="value" id="dateValue"></span></label>
-    <input type="date" id="birthdate">
-
-    <br><br>
-
-    <label for="gender">Płeć: <span class="value" id="genderValue"></span></label>
-    <select id="gender">
-        <option value="">Wybierz...</option>
-        <option value="KOBIETA">Kobieta</option>
-        <option value="MĘŻCZYZNA">Mężczyzna</option>
-    </select>
-
-    <br><br>
-
-    <label>Twój PESEL: <span class="value" id="peselValue">–</span></label>
-    <label>Nazwisko rodowe ojca: <input type="text" id="daneOjca" required></label>
-    <label>Nazwisko rodowe matki: <input type="text" id="daneMatki" required></label>
-    <label>Miejsce urodzenia: <input type="text" id="miejsceUrodzenia" required></label>
-    <label>Adres zameldowania (pierwsza linia|kod pocztowy i miasto):
-      <input type="text" id="adres" placeholder="Ulica|Kod Miasto" required>
-    </label>
-    <label>Data zameldowania: <input type="date" id="dataZameldowania" required></label>
-    <button type="submit">Zapisz ✅</button>
-  </form>
+  <button id="zapisz">Zapisz i pokaż dowód</button>
 
   <script>
-    // Jeśli dane już są — przekieruj
-    if (localStorage.getItem("dane1")) {
-      window.location.href = "logowanie.html";
-    }
+    document.getElementById("zapisz").addEventListener("click", async () => {
+      function set(k,v){ localStorage.setItem(k,v); }
 
-    const form = document.getElementById("daneForm");
-    const birthdateInput = document.getElementById('birthdate');
-    const genderSelect = document.getElementById('gender');
-    const dateValue = document.getElementById('dateValue');
-    const genderValue = document.getElementById('genderValue');
-    const peselValue = document.getElementById('peselValue');
+      const imie = document.getElementById("imie").value;
+      const nazwisko = document.getElementById("nazwisko").value;
+      const birthdate = document.getElementById("birthdate").value;
+      const pesel = document.getElementById("pesel").value;
+      const ojciec = document.getElementById("ojciec").value;
+      const matka = document.getElementById("matka").value;
+      const miejsce = document.getElementById("miejsce").value;
+      const adres1 = document.getElementById("adres1").value;
+      const adres2 = document.getElementById("adres2").value;
+      const dataZameldowania = document.getElementById("dataZameldowania").value;
 
-    // Jeśli wracamy na stronę, ustaw wartości z localStorage
-    dateValue.textContent = localStorage.getItem('birthdate') || '';
-    genderValue.textContent = localStorage.getItem('gender') || '';
-    peselValue.textContent = localStorage.getItem('pesel') || '–';
-    birthdateInput.value = localStorage.getItem('birthdate') || '';
-    genderSelect.value = localStorage.getItem('gender') || '';
+      set("dane1", imie);
+      set("dane2", nazwisko);
+      set("birthdate", birthdate);
+      set("pesel", pesel);
+      set("daneOjca", ojciec);
+      set("daneMatki", matka);
+      set("miejsceUrodzenia", miejsce);
+      set("adres", adres1 + "|" + adres2);
+      set("dataZameldowania", dataZameldowania);
 
-    // Pokazywanie aktualnego wyboru
-    birthdateInput.addEventListener('input', () => {
-      dateValue.textContent = birthdateInput.value;
-      updatePesel();
-    });
-
-    genderSelect.addEventListener('change', () => {
-      genderValue.textContent = genderSelect.value;
-      updatePesel();
-    });
-
-    function updatePesel() {
-      const date = birthdateInput.value;
-      const gender = genderSelect.value;
-      if (!date || !gender) {
-        peselValue.textContent = "–";
-        return;
+      // 📸 zdjęcie → base64
+      const file = document.getElementById("zdjecie").files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          localStorage.setItem("zdjecie", e.target.result);
+          window.location.href = "dowodnowy.html";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        window.location.href = "dowodnowy.html";
       }
-
-      peselValue.textContent = generatePesel(date, gender);
-    }
-
-    // Funkcja generująca PESEL (roleplay)
-    function generatePesel(dateStr, gender) {
-      const date = new Date(dateStr);
-      const yy = date.getFullYear() % 100;
-      const mm = date.getMonth() + 1;
-      const dd = date.getDate();
-      const month = mm < 10 ? '0'+mm : mm;
-      const day = dd < 10 ? '0'+dd : dd;
-
-      const random3 = String(Math.floor(Math.random()*1000)).padStart(3,'0');
-      let genderDigit = Math.floor(Math.random()*5)*2;
-      if (gender === "MĘŻCZYZNA") genderDigit += 1;
-
-      const peselWithoutChecksum = `${yy}${month}${day}${random3}${genderDigit}`;
-      let sum = 1*peselWithoutChecksum[0] + 3*peselWithoutChecksum[1] + 7*peselWithoutChecksum[2] + 9*peselWithoutChecksum[3]
-              + 1*peselWithoutChecksum[4] + 3*peselWithoutChecksum[5] + 7*peselWithoutChecksum[6] + 9*peselWithoutChecksum[7]
-              + 1*peselWithoutChecksum[8] + 3*peselWithoutChecksum[9];
-      const checksum = (10 - (sum % 10)) % 10;
-      return peselWithoutChecksum + checksum;
-    }
-
-    // Zapis danych
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const dane1 = document.getElementById("dane1").value.toUpperCase();
-      const dane2 = document.getElementById("dane2").value.toUpperCase();
-      const zdjecieInput = document.getElementById("zdjecie").files[0];
-      const birthdate = birthdateInput.value;
-      const gender = genderSelect.value;
-      const pesel = peselValue.textContent;
-
-      if (!birthdate || !gender) {
-        alert('Wybierz wszystkie dane!');
-        return;
-      }
-
-      if (!zdjecieInput) {
-        alert("Wybierz zdjęcie!");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        localStorage.setItem("dane1", dane1);
-        localStorage.setItem("dane2", dane2);
-        localStorage.setItem("zdjecie", reader.result);
-        localStorage.setItem("birthdate", birthdate);
-        localStorage.setItem("gender", gender);
-        localStorage.setItem("pesel", pesel);
-        localStorage.setItem('daneOjca', document.getElementById('daneOjca').value.toUpperCase());
-        localStorage.setItem('daneMatki', document.getElementById('daneMatki').value.toUpperCase());
-        localStorage.setItem('miejsceUrodzenia', document.getElementById('miejsceUrodzenia').value.toUpperCase());
-        localStorage.setItem('adres', document.getElementById('adres').value.toUpperCase());
-        localStorage.setItem('dataZameldowania', document.getElementById('dataZameldowania').value);
-        window.location.href = "logowanie.html";
-      };
-      reader.readAsDataURL(zdjecieInput);
     });
   </script>
-</body>
-</html>
+
+</html></body>
