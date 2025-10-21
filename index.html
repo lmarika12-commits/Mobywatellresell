@@ -18,105 +18,193 @@
   </style>
 </head>
 
-<body>
-  <h2>Wprowadź dane do dowodu</h2>
+body>
+  <h1>Wprowadź dane do dowodu</h1>
 
-  <input id="imie" placeholder="Imię">
-  <input id="nazwisko" placeholder="Nazwisko">
-  <input id="birthdate" type="date" placeholder="Data urodzenia">
-  <input id="pesel" placeholder="PESEL">
-  <input id="ojciec" placeholder="Imię ojca">
-  <input id="matka" placeholder="Imię matki">
-  <input id="miejsce" placeholder="Miejsce urodzenia">
-  <input id="adres1" placeholder="Ulica i nr domu">
-  <input id="adres2" placeholder="Kod i miejscowość">
-  <input id="dataZameldowania" type="date" placeholder="Data zameldowania">
-  
-  <label>Zdjęcie: </label>
-  <input type="file" id="zdjecie" accept="image/*">
+  <label for="dane1">Imię</label>
+  <input id="dane1" type="text" placeholder="IMIĘ (caps optional)">
 
-  <button id="zapisz">Zapisz i pokaż dowód</button>
-  <script>
-    // helper: generate roleplay PESEL (simplified, not real-identical)
-    function generatePesel(dateStr, gender) {
-      if (!dateStr || !gender) return '';
-      const d = new Date(dateStr);
-      if (isNaN(d)) return '';
-      let year = d.getFullYear();
-      let yy = String(year).slice(-2);
-      let mm = d.getMonth() + 1; // 1-12
-      let dd = d.getDate();
-      // handle century for PESEL style (simple): if year >=2000 add 20 to month
-      if (year >= 2000) mm += 20;
-      const mmStr = String(mm).padStart(2,'0');
-      const ddStr = String(dd).padStart(2,'0');
-      const serial = String(Math.floor(Math.random()*900)+100); // 3 digits
-      let genderDigit = Math.floor(Math.random()*5)*2; // even
-      if (gender === 'MĘŻCZYZNA') genderDigit += 1; // make odd
-      const first10 = yy + mmStr + ddStr + serial + genderDigit;
-      const weights = [1,3,7,9,1,3,7,9,1,3];
-      let sum = 0;
-      for (let i=0;i<10;i++) sum += weights[i] * Number(first10[i]);
-      const checksum = (10 - (sum % 10)) % 10;
-      return first10 + checksum;
-    }
+  <label for="dane2">Nazwisko</label>
+  <input id="dane2" type="text" placeholder="NAZWISKO">
 
-    // show dynamic PESEL preview when date or gender changes
-    const birthInput = document.getElementById('birthdate');
-    const genderInput = document.getElementById('gender');
-    const peselPreview = document.getElementById('peselPreview');
+  <div class="two">
+    <div>
+      <label for="gender">Płeć</label>
+      <select id="gender">
+        <option value="">— wybierz —</option>
+        <option value="KOBIETA">KOBIETA</option>
+        <option value="MĘŻCZYZNA">MĘŻCZYZNA</option>
+      </select>
+    </div>
+    <div>
+      <label for="birthdate">Data urodzenia</label>
+      <input id="birthdate" type="date">
+    </div>
+  </div>
 
-    function updatePreview() {
-      const p = generatePesel(birthInput.value, genderInput.value);
-      peselPreview.textContent = p ? ('PESEL: ' + p) : 'PESEL: —';
-    }
-    birthInput.addEventListener('input', updatePreview);
-    genderInput.addEventListener('change', updatePreview);
+  <p id="peselPreview" class="small">PESEL: —</p>
 
-    document.getElementById('saveBtn').addEventListener('click', function(){
-      // simple validation
-      const imie = document.getElementById('dane1').value.trim();
-      const nazwisko = document.getElementById('dane2').value.trim();
-      if (!imie || !nazwisko) { alert('Wpisz imię i nazwisko'); return; }
+  <label for="daneOjca">Nazwisko rodowe ojca</label>
+  <input id="daneOjca" type="text" placeholder="NAZWISKO RODOWE OJCA">
 
-      // set items
-      localStorage.setItem('dane1', imie.toUpperCase());
-      localStorage.setItem('dane2', nazwisko.toUpperCase());
-      localStorage.setItem('gender', genderInput.value);
-      localStorage.setItem('birthdate', birthInput.value);
-      // pesel — generate now and store
-      const pesel = generatePesel(birthInput.value, genderInput.value);
-      if (pesel) localStorage.setItem('pesel', pesel);
+  <label for="daneMatki">Nazwisko rodowe matki</label>
+  <input id="daneMatki" type="text" placeholder="NAZWISKO RODOWE MATKI">
 
-      localStorage.setItem('daneOjca', document.getElementById('daneOjca').value.toUpperCase());
-      localStorage.setItem('daneMatki', document.getElementById('daneMatki').value.toUpperCase());
-      localStorage.setItem('miejsceUrodzenia', document.getElementById('miejsceUrodzenia').value.toUpperCase());
-      const a1 = document.getElementById('adres1').value.toUpperCase();
-      const a2 = document.getElementById('adres2').value.toUpperCase();
-      localStorage.setItem('adres', a1 + '|' + a2);
-      localStorage.setItem('dataZameldowania', document.getElementById('dataZameldowania').value);
+  <label for="miejsceUrodzenia">Miejsce urodzenia</label>
+  <input id="miejsceUrodzenia" type="text" placeholder="MIEJSCE URODZENIA">
 
-      // save image if selected
-      const file = document.getElementById('zdjecie').files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          try { localStorage.setItem('zdjecie', e.target.result); } catch(err) {
-            alert('Obrazek za duży dla localStorage — zmniejsz zdjęcie.');
-            console.error(err);
-          }
-          window.location.href = 'dowodnowy.html';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        // no image selected — clear any previous image so dowod shows placeholder
-        localStorage.removeItem('zdjecie');
-        window.location.href = 'dowodnowy.html';
+  <div class="two">
+    <div>
+      <label for="adres1">Adres zameldowania — linia 1 (ulica i nr)</label>
+      <input id="adres1" type="text" placeholder="Ulica i numer">
+    </div>
+    <div>
+      <label for="adres2">Adres zameldowania — linia 2 (kod i miejscowość)</label>
+      <input id="adres2" type="text" placeholder="00-000 MIASTO">
+    </div>
+  </div>
+
+  <label for="dataZameldowania">Data zameldowania</label>
+  <input id="dataZameldowania" type="date">
+
+  <label for="zdjecie">Zdjęcie (avatar) — wybierz plik JPG/PNG</label>
+  <input id="zdjecie" type="file" accept="image/*">
+  <div class="help">Uwaga: zbyt duże zdjęcie może nie zmieścić się w localStorage (zalecane małe zdjęcie).</div>
+
+  <button id="saveBtn">Zapisz i pokaż dowód</button>
+
+<script>
+/*
+  Kompletny index.html:
+  - generuje PESEL (roleplay) z daty i płci (ma checksum)
+  - pokazuje podgląd PESEL
+  - zapisuje wszystkie pola w localStorage:
+    dane1,dane2,gender,birthdate,pesel,daneOjca,daneMatki,miejsceUrodzenia,adres,dataZameldowania,zdjecie
+  - zapisuje zdjęcie jako dataURL (jeśli podane) i przekierowuje na dowodnowy.html
+*/
+
+// Pomocnik: generuje losowy PESEL (roleplay, z checksum)
+function generatePesel(birthdate, gender) {
+  if (!birthdate || !gender) return '';
+
+  const d = new Date(birthdate);
+  if (isNaN(d)) return '';
+
+  const year = d.getFullYear();
+  let month = d.getMonth() + 1; // 1..12
+  const day = d.getDate();
+
+  // PESEL month encoding (supports 1800/1900/2000/2100/2200)
+  // dla prostoty obsłużymy 1900 i 2000 poprawnie:
+  // jeśli rok >=2000 -> month += 20
+  if (year >= 2000 && year < 2100) {
+    month += 20;
+  } else if (year >= 1800 && year < 1900) {
+    month += 80;
+  } else if (year >= 2100 && year < 2200) {
+    month += 40;
+  } else if (year >= 2200 && year < 2300) {
+    month += 60;
+  } // else 1900..1999 -> no change
+
+  const yy = String(year).slice(-2).padStart(2,'0');
+  const mm = String(month).padStart(2,'0');
+  const dd = String(day).padStart(2,'0');
+
+  // wygeneruj 4-cyfrowy numer seryjny (3 cyfry + 1 cyfra płci)
+  const serial3 = String(Math.floor(Math.random()*900) + 100); // 100-999
+  let genderDigit = Math.floor(Math.random()*5) * 2; // 0,2,4,6,8
+  if (gender === 'MĘŻCZYZNA') genderDigit += 1; // 1,3,5,7,9
+  const first10 = yy + mm + dd + serial3 + String(genderDigit);
+
+  // oblicz sumę kontrolną zgodnie z wagami PESEL
+  const weights = [1,3,7,9,1,3,7,9,1,3];
+  let sum = 0;
+  for (let i=0;i<10;i++) {
+    sum += weights[i] * Number(first10[i]);
+  }
+  const checksum = (10 - (sum % 10)) % 10;
+
+  return first10 + checksum;
+}
+
+// Aktualizuj podgląd PESEL przy zmianie daty/płci
+const birthInput = document.getElementById('birthdate');
+const genderInput = document.getElementById('gender');
+const peselPreview = document.getElementById('peselPreview');
+
+function updatePeselPreview(){
+  const p = generatePesel(birthInput.value, genderInput.value);
+  peselPreview.textContent = p ? ('PESEL: ' + p) : 'PESEL: —';
+}
+birthInput.addEventListener('input', updatePeselPreview);
+genderInput.addEventListener('change', updatePeselPreview);
+
+// Obsługa przycisku zapisz
+document.getElementById('saveBtn').addEventListener('click', function(){
+  // pobierz wartości
+  const dane1 = document.getElementById('dane1').value.trim();
+  const dane2 = document.getElementById('dane2').value.trim();
+  const gender = document.getElementById('gender').value;
+  const birthdate = document.getElementById('birthdate').value;
+  const daneOjca = document.getElementById('daneOjca').value.trim();
+  const daneMatki = document.getElementById('daneMatki').value.trim();
+  const miejsceUrodzenia = document.getElementById('miejsceUrodzenia').value.trim();
+  const adres1 = document.getElementById('adres1').value.trim();
+  const adres2 = document.getElementById('adres2').value.trim();
+  const dataZameldowania = document.getElementById('dataZameldowania').value;
+
+  // proste walidacje
+  if (!dane1 || !dane2) { alert('Wpisz imię i nazwisko'); return; }
+  if (!gender) { alert('Wybierz płeć'); return; }
+  if (!birthdate) { alert('Wybierz datę urodzenia'); return; }
+
+  // generuj PESEL i zapisz wszystko
+  const pesel = generatePesel(birthdate, gender);
+
+  try {
+    localStorage.setItem('dane1', dane1.toUpperCase());
+    localStorage.setItem('dane2', dane2.toUpperCase());
+    localStorage.setItem('gender', gender);
+    localStorage.setItem('birthdate', birthdate);
+    localStorage.setItem('pesel', pesel);
+    localStorage.setItem('daneOjca', daneOjca.toUpperCase());
+    localStorage.setItem('daneMatki', daneMatki.toUpperCase());
+    localStorage.setItem('miejsceUrodzenia', miejsceUrodzenia.toUpperCase());
+    localStorage.setItem('adres', (adres1 + '|' + adres2).toUpperCase());
+    localStorage.setItem('dataZameldowania', dataZameldowania);
+  } catch(err) {
+    console.error('Błąd zapisu do localStorage', err);
+    alert('Błąd zapisu danych — możliwe, że zdjęcie jest za duże lub localStorage jest pełne.');
+    return;
+  }
+
+  // zapis zdjęcia (plik -> dataURL) jeśli wybrano
+  const file = document.getElementById('zdjecie').files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        localStorage.setItem('zdjecie', e.target.result);
+      } catch(err) {
+        console.error('Błąd zapisu zdjęcia do localStorage', err);
+        alert('Zdjęcie za duże — zapisz bez zdjęcia lub użyj mniejszego pliku.');
+        // mimo błędu ze zdjęciem, możemy nadal przekierować (jeśli chcesz)
+        // return;
       }
-    });
+      // po zapisie przekieruj
+      window.location.href = 'dowodnowy.html';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // usuń ewentualne stare zdjęcie, żeby nie trzymać niechcianego
+    localStorage.removeItem('zdjecie');
+    window.location.href = 'dowodnowy.html';
+  }
+});
 
-    // debug help: expose a function to clear storage quickly
-    window.DEBUG_clearLS = () => { localStorage.clear(); alert('localStorage cleared'); };
-  </script>
+// expose debug helper na wypadek problemów
+window.DEBUG_printLS = () => { console.log('localStorage snapshot:', {...localStorage}); alert('Zajrzyj do konsoli (F12) — snapshot wydrukowany'); };
+</script>
 </body>
 </html>
