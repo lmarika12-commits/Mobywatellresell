@@ -1,210 +1,94 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <title>Moja apka</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial; max-width: 400px; margin: auto; padding: 20px; }
-    label { display: block; margin-top: 15px; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 20px; padding: 10px; width: 100%; font-weight: bold; cursor: pointer; }
-    span.value { font-weight: bold; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formularz mDowód</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+input, select { margin-bottom: 10px; width: 100%; padding: 8px; }
+button { padding: 10px 20px; font-weight: bold; cursor: pointer; }
+</style>
 </head>
-
-body>
-  <h1>Wprowadź dane do dowodu</h1>
-
-  <label for="dane1">Imię</label>
-  <input id="dane1" type="text" placeholder="IMIĘ (caps optional)">
-
-  <label for="dane2">Nazwisko</label>
-  <input id="dane2" type="text" placeholder="NAZWISKO">
-
-  <div class="two">
-    <div>
-      <label for="gender">Płeć</label>
-      <select id="gender">
-        <option value="">— wybierz —</option>
-        <option value="KOBIETA">KOBIETA</option>
-        <option value="MĘŻCZYZNA">MĘŻCZYZNA</option>
-      </select>
-    </div>
-    <div>
-      <label for="birthdate">Data urodzenia</label>
-      <input id="birthdate" type="date">
-    </div>
-  </div>
-
-  <p id="peselPreview" class="small">PESEL: —</p>
-
-  <label for="daneOjca">Nazwisko rodowe ojca</label>
-  <input id="daneOjca" type="text" placeholder="NAZWISKO RODOWE OJCA">
-
-  <label for="daneMatki">Nazwisko rodowe matki</label>
-  <input id="daneMatki" type="text" placeholder="NAZWISKO RODOWE MATKI">
-
-  <label for="miejsceUrodzenia">Miejsce urodzenia</label>
-  <input id="miejsceUrodzenia" type="text" placeholder="MIEJSCE URODZENIA">
-
-  <div class="two">
-    <div>
-      <label for="adres1">Adres zameldowania — linia 1 (ulica i nr)</label>
-      <input id="adres1" type="text" placeholder="Ulica i numer">
-    </div>
-    <div>
-      <label for="adres2">Adres zameldowania — linia 2 (kod i miejscowość)</label>
-      <input id="adres2" type="text" placeholder="00-000 MIASTO">
-    </div>
-  </div>
-
-  <label for="dataZameldowania">Data zameldowania</label>
-  <input id="dataZameldowania" type="date">
-
-  <label for="zdjecie">Zdjęcie (avatar) — wybierz plik JPG/PNG</label>
-  <input id="zdjecie" type="file" accept="image/*">
-  <div class="help">Uwaga: zbyt duże zdjęcie może nie zmieścić się w localStorage (zalecane małe zdjęcie).</div>
-
-  <button id="saveBtn">Zapisz i pokaż dowód</button>
+<body>
+<h2>Wprowadź swoje dane</h2>
+<form id="form">
+  <input type="text" id="imie" placeholder="Imię">
+  <input type="text" id="nazwisko" placeholder="Nazwisko">
+  <select id="plec">
+    <option value="">Wybierz płeć</option>
+    <option value="M">Mężczyzna</option>
+    <option value="K">Kobieta</option>
+  </select>
+  <input type="date" id="birthdate">
+  <input type="text" id="daneOjca" placeholder="Imię ojca">
+  <input type="text" id="daneMatki" placeholder="Imię matki">
+  <input type="text" id="miejsceUrodzenia" placeholder="Miejsce urodzenia">
+  <input type="text" id="adres" placeholder="Adres zameldowania (linia1|linia2)">
+  <input type="date" id="dataZameldowania" placeholder="Data zameldowania">
+  <input type="file" id="zdjecie" accept="image/*">
+  <button type="submit">Zapisz i przejdź do dowodu</button>
+</form>
 
 <script>
-/*
-  Kompletny index.html:
-  - generuje PESEL (roleplay) z daty i płci (ma checksum)
-  - pokazuje podgląd PESEL
-  - zapisuje wszystkie pola w localStorage:
-    dane1,dane2,gender,birthdate,pesel,daneOjca,daneMatki,miejsceUrodzenia,adres,dataZameldowania,zdjecie
-  - zapisuje zdjęcie jako dataURL (jeśli podane) i przekierowuje na dowodnowy.html
-*/
-
-// Pomocnik: generuje losowy PESEL (roleplay, z checksum)
 function generatePesel(birthdate, gender) {
   if (!birthdate || !gender) return '';
+  const date = new Date(birthdate);
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
 
-  const d = new Date(birthdate);
-  if (isNaN(d)) return '';
+  // Obsługa XX wieku (1900-1999)
+  if (year >= 2000) month += 20; // dla XXI wieku
+  let y = String(year).slice(2);
+  let m = String(month).padStart(2,'0');
+  let d = String(day).padStart(2,'0');
 
-  const year = d.getFullYear();
-  let month = d.getMonth() + 1; // 1..12
-  const day = d.getDate();
-
-  // PESEL month encoding (supports 1800/1900/2000/2100/2200)
-  // dla prostoty obsłużymy 1900 i 2000 poprawnie:
-  // jeśli rok >=2000 -> month += 20
-  if (year >= 2000 && year < 2100) {
-    month += 20;
-  } else if (year >= 1800 && year < 1900) {
-    month += 80;
-  } else if (year >= 2100 && year < 2200) {
-    month += 40;
-  } else if (year >= 2200 && year < 2300) {
-    month += 60;
-  } // else 1900..1999 -> no change
-
-  const yy = String(year).slice(-2).padStart(2,'0');
-  const mm = String(month).padStart(2,'0');
-  const dd = String(day).padStart(2,'0');
-
-  // wygeneruj 4-cyfrowy numer seryjny (3 cyfry + 1 cyfra płci)
-  const serial3 = String(Math.floor(Math.random()*900) + 100); // 100-999
-  let genderDigit = Math.floor(Math.random()*5) * 2; // 0,2,4,6,8
-  if (gender === 'MĘŻCZYZNA') genderDigit += 1; // 1,3,5,7,9
-  const first10 = yy + mm + dd + serial3 + String(genderDigit);
-
-  // oblicz sumę kontrolną zgodnie z wagami PESEL
-  const weights = [1,3,7,9,1,3,7,9,1,3];
-  let sum = 0;
-  for (let i=0;i<10;i++) {
-    sum += weights[i] * Number(first10[i]);
-  }
-  const checksum = (10 - (sum % 10)) % 10;
-
-  return first10 + checksum;
+  let genderDigit = gender === 'M' ? 1 : 0;
+  let serial = Math.floor(Math.random()*999);
+  serial = String(serial).padStart(3,'0');
+  return y + m + d + serial + genderDigit;
 }
 
-// Aktualizuj podgląd PESEL przy zmianie daty/płci
-const birthInput = document.getElementById('birthdate');
-const genderInput = document.getElementById('gender');
-const peselPreview = document.getElementById('peselPreview');
-
-function updatePeselPreview(){
-  const p = generatePesel(birthInput.value, genderInput.value);
-  peselPreview.textContent = p ? ('PESEL: ' + p) : 'PESEL: —';
-}
-birthInput.addEventListener('input', updatePeselPreview);
-genderInput.addEventListener('change', updatePeselPreview);
-
-// Obsługa przycisku zapisz
-document.getElementById('saveBtn').addEventListener('click', function(){
-  // pobierz wartości
-  const dane1 = document.getElementById('dane1').value.trim();
-  const dane2 = document.getElementById('dane2').value.trim();
-  const gender = document.getElementById('gender').value;
+document.getElementById('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const imie = document.getElementById('imie').value;
+  const nazwisko = document.getElementById('nazwisko').value;
+  const plec = document.getElementById('plec').value;
   const birthdate = document.getElementById('birthdate').value;
-  const daneOjca = document.getElementById('daneOjca').value.trim();
-  const daneMatki = document.getElementById('daneMatki').value.trim();
-  const miejsceUrodzenia = document.getElementById('miejsceUrodzenia').value.trim();
-  const adres1 = document.getElementById('adres1').value.trim();
-  const adres2 = document.getElementById('adres2').value.trim();
+  const daneOjca = document.getElementById('daneOjca').value;
+  const daneMatki = document.getElementById('daneMatki').value;
+  const miejsceUrodzenia = document.getElementById('miejsceUrodzenia').value;
+  const adres = document.getElementById('adres').value;
   const dataZameldowania = document.getElementById('dataZameldowania').value;
 
-  // proste walidacje
-  if (!dane1 || !dane2) { alert('Wpisz imię i nazwisko'); return; }
-  if (!gender) { alert('Wybierz płeć'); return; }
-  if (!birthdate) { alert('Wybierz datę urodzenia'); return; }
-
-  // generuj PESEL i zapisz wszystko
-  const pesel = generatePesel(birthdate, gender);
-
-  try {
-    localStorage.setItem('dane1', dane1.toUpperCase());
-    localStorage.setItem('dane2', dane2.toUpperCase());
-    localStorage.setItem('gender', gender);
-    localStorage.setItem('birthdate', birthdate);
-    localStorage.setItem('pesel', pesel);
-    localStorage.setItem('daneOjca', daneOjca.toUpperCase());
-    localStorage.setItem('daneMatki', daneMatki.toUpperCase());
-    localStorage.setItem('miejsceUrodzenia', miejsceUrodzenia.toUpperCase());
-    localStorage.setItem('adres', (adres1 + '|' + adres2).toUpperCase());
-    localStorage.setItem('dataZameldowania', dataZameldowania);
-  } catch(err) {
-    console.error('Błąd zapisu do localStorage', err);
-    alert('Błąd zapisu danych — możliwe, że zdjęcie jest za duże lub localStorage jest pełne.');
-    return;
-  }
-
-  // zapis zdjęcia (plik -> dataURL) jeśli wybrano
   const file = document.getElementById('zdjecie').files[0];
-  if (file) {
+  if(file){
     const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        localStorage.setItem('zdjecie', e.target.result);
-      } catch(err) {
-        console.error('Błąd zapisu zdjęcia do localStorage', err);
-        alert('Zdjęcie za duże — zapisz bez zdjęcia lub użyj mniejszego pliku.');
-        // mimo błędu ze zdjęciem, możemy nadal przekierować (jeśli chcesz)
-        // return;
-      }
-      // po zapisie przekieruj
-      window.location.href = 'dowodnowy.html';
-    };
+    reader.onload = function(){
+      localStorage.setItem('zdjecie', reader.result);
+      saveData();
+    }
     reader.readAsDataURL(file);
   } else {
-    // usuń ewentualne stare zdjęcie, żeby nie trzymać niechcianego
-    localStorage.removeItem('zdjecie');
+    saveData();
+  }
+
+  function saveData(){
+    localStorage.setItem('dane1', imie);
+    localStorage.setItem('dane2', nazwisko);
+    localStorage.setItem('plec', plec);
+    localStorage.setItem('birthdate', birthdate);
+    localStorage.setItem('daneOjca', daneOjca);
+    localStorage.setItem('daneMatki', daneMatki);
+    localStorage.setItem('miejsceUrodzenia', miejsceUrodzenia);
+    localStorage.setItem('adres', adres);
+    localStorage.setItem('dataZameldowania', dataZameldowania);
+    const pesel = generatePesel(birthdate, plec);
+    localStorage.setItem('pesel', pesel);
     window.location.href = 'dowodnowy.html';
   }
 });
-
-// expose debug helper na wypadek problemów
-window.DEBUG_printLS = () => { console.log('localStorage snapshot:', {...localStorage}); alert('Zajrzyj do konsoli (F12) — snapshot wydrukowany'); };
 </script>
 </body>
 </html>
