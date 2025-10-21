@@ -17,6 +17,7 @@
     span.value { font-weight: bold; }
   </style>
 </head>
+
 <body>
   <h2>Wprowadź dane do dowodu</h2>
 
@@ -35,45 +36,87 @@
   <input type="file" id="zdjecie" accept="image/*">
 
   <button id="zapisz">Zapisz i pokaż dowód</button>
-
   <script>
-    document.getElementById("zapisz").addEventListener("click", async () => {
-      function set(k,v){ localStorage.setItem(k,v); }
+    // helper: generate roleplay PESEL (simplified, not real-identical)
+    function generatePesel(dateStr, gender) {
+      if (!dateStr || !gender) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      let year = d.getFullYear();
+      let yy = String(year).slice(-2);
+      let mm = d.getMonth() + 1; // 1-12
+      let dd = d.getDate();
+      // handle century for PESEL style (simple): if year >=2000 add 20 to month
+      if (year >= 2000) mm += 20;
+      const mmStr = String(mm).padStart(2,'0');
+      const ddStr = String(dd).padStart(2,'0');
+      const serial = String(Math.floor(Math.random()*900)+100); // 3 digits
+      let genderDigit = Math.floor(Math.random()*5)*2; // even
+      if (gender === 'MĘŻCZYZNA') genderDigit += 1; // make odd
+      const first10 = yy + mmStr + ddStr + serial + genderDigit;
+      const weights = [1,3,7,9,1,3,7,9,1,3];
+      let sum = 0;
+      for (let i=0;i<10;i++) sum += weights[i] * Number(first10[i]);
+      const checksum = (10 - (sum % 10)) % 10;
+      return first10 + checksum;
+    }
 
-      const imie = document.getElementById("imie").value;
-      const nazwisko = document.getElementById("nazwisko").value;
-      const birthdate = document.getElementById("birthdate").value;
-      const pesel = document.getElementById("pesel").value;
-      const ojciec = document.getElementById("ojciec").value;
-      const matka = document.getElementById("matka").value;
-      const miejsce = document.getElementById("miejsce").value;
-      const adres1 = document.getElementById("adres1").value;
-      const adres2 = document.getElementById("adres2").value;
-      const dataZameldowania = document.getElementById("dataZameldowania").value;
+    // show dynamic PESEL preview when date or gender changes
+    const birthInput = document.getElementById('birthdate');
+    const genderInput = document.getElementById('gender');
+    const peselPreview = document.getElementById('peselPreview');
 
-      set("dane1", imie);
-      set("dane2", nazwisko);
-      set("birthdate", birthdate);
-      set("pesel", pesel);
-      set("daneOjca", ojciec);
-      set("daneMatki", matka);
-      set("miejsceUrodzenia", miejsce);
-      set("adres", adres1 + "|" + adres2);
-      set("dataZameldowania", dataZameldowania);
+    function updatePreview() {
+      const p = generatePesel(birthInput.value, genderInput.value);
+      peselPreview.textContent = p ? ('PESEL: ' + p) : 'PESEL: —';
+    }
+    birthInput.addEventListener('input', updatePreview);
+    genderInput.addEventListener('change', updatePreview);
 
-      // 📸 zdjęcie → base64
-      const file = document.getElementById("zdjecie").files[0];
+    document.getElementById('saveBtn').addEventListener('click', function(){
+      // simple validation
+      const imie = document.getElementById('dane1').value.trim();
+      const nazwisko = document.getElementById('dane2').value.trim();
+      if (!imie || !nazwisko) { alert('Wpisz imię i nazwisko'); return; }
+
+      // set items
+      localStorage.setItem('dane1', imie.toUpperCase());
+      localStorage.setItem('dane2', nazwisko.toUpperCase());
+      localStorage.setItem('gender', genderInput.value);
+      localStorage.setItem('birthdate', birthInput.value);
+      // pesel — generate now and store
+      const pesel = generatePesel(birthInput.value, genderInput.value);
+      if (pesel) localStorage.setItem('pesel', pesel);
+
+      localStorage.setItem('daneOjca', document.getElementById('daneOjca').value.toUpperCase());
+      localStorage.setItem('daneMatki', document.getElementById('daneMatki').value.toUpperCase());
+      localStorage.setItem('miejsceUrodzenia', document.getElementById('miejsceUrodzenia').value.toUpperCase());
+      const a1 = document.getElementById('adres1').value.toUpperCase();
+      const a2 = document.getElementById('adres2').value.toUpperCase();
+      localStorage.setItem('adres', a1 + '|' + a2);
+      localStorage.setItem('dataZameldowania', document.getElementById('dataZameldowania').value);
+
+      // save image if selected
+      const file = document.getElementById('zdjecie').files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          localStorage.setItem("zdjecie", e.target.result);
-          window.location.href = "dowodnowy.html";
+          try { localStorage.setItem('zdjecie', e.target.result); } catch(err) {
+            alert('Obrazek za duży dla localStorage — zmniejsz zdjęcie.');
+            console.error(err);
+          }
+          window.location.href = 'dowodnowy.html';
         };
         reader.readAsDataURL(file);
       } else {
-        window.location.href = "dowodnowy.html";
+        // no image selected — clear any previous image so dowod shows placeholder
+        localStorage.removeItem('zdjecie');
+        window.location.href = 'dowodnowy.html';
       }
     });
-  </script>
 
-</html></body>
+    // debug help: expose a function to clear storage quickly
+    window.DEBUG_clearLS = () => { localStorage.clear(); alert('localStorage cleared'); };
+  </script>
+</body>
+</html>
